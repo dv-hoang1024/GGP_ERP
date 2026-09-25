@@ -9,14 +9,14 @@ class TestDeskAssetRevision(unittest.TestCase):
 	def test_desk_hooks_use_revisioned_entry_points(self):
 		hooks = (APP_ROOT / "gg_power" / "hooks.py").read_text(encoding="utf-8")
 
-		self.assertIn("/assets/gg_power/css/gg_power_desk_v6.css", hooks)
-		self.assertIn("/assets/gg_power/js/gg_power_desk_v6.js", hooks)
+		self.assertIn("/assets/gg_power/css/gg_power_desk_v7.css", hooks)
+		self.assertIn("/assets/gg_power/js/gg_power_desk_v7.js", hooks)
 
 	def test_revisioned_assets_force_fresh_base_assets(self):
-		css_entry = (APP_ROOT / "gg_power" / "public" / "css" / "gg_power_desk_v6.css").read_text(
+		css_entry = (APP_ROOT / "gg_power" / "public" / "css" / "gg_power_desk_v7.css").read_text(
 			encoding="utf-8"
 		)
-		js_entry = (APP_ROOT / "gg_power" / "public" / "js" / "gg_power_desk_v6.js").read_text(
+		js_entry = (APP_ROOT / "gg_power" / "public" / "js" / "gg_power_desk_v7.js").read_text(
 			encoding="utf-8"
 		)
 

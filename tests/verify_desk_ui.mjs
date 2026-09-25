@@ -100,8 +100,8 @@ const result = await evaluate(`(() => {
 			href: icon.getAttribute('href'),
 		})),
 		hasLegacyProductName: /ERPNext/.test(document.body.innerText),
-		cssV6Loaded: Array.from(document.styleSheets).some((sheet) => sheet.href?.includes('gg_power_desk_v6.css')),
-		jsV6Loaded: Array.from(document.scripts).some((script) => script.src.includes('gg_power_desk_v6.js')),
+		cssV7Loaded: Array.from(document.styleSheets).some((sheet) => sheet.href?.includes('gg_power_desk_v7.css')),
+		jsV7Loaded: Array.from(document.scripts).some((script) => script.src.includes('gg_power_desk_v7.js')),
 	};
 })()`);
 console.log(JSON.stringify(result));
@@ -110,16 +110,16 @@ await send("Page.navigate", { url: "http://ggpower.localhost:8002/app/manufactur
 await waitFor("document.readyState === 'complete'");
 await waitFor("Boolean(document.querySelector('.sidebar-header .header-logo'))");
 await waitFor("document.querySelector('.sidebar-header .header-subtitle')?.textContent.trim() === 'GGPower ERP'");
-await waitFor("Boolean(document.querySelector('.sidebar-header .gg-sidebar-brand-logo')?.complete && document.querySelector('.sidebar-header .gg-sidebar-brand-logo')?.naturalWidth)");
+await waitFor("document.querySelector('.sidebar-header .header-logo')?.dataset.ggModuleIcon === 'factory'");
+await waitFor("Boolean(document.querySelector('.sidebar-header .header-logo svg'))");
 
 const workspaceBranding = await evaluate(`(() => {
-	const logo = document.querySelector('.sidebar-header .header-logo img');
+	const logo = document.querySelector('.sidebar-header .header-logo');
 	const subtitle = document.querySelector('.sidebar-header .header-subtitle');
 	const visibleText = document.body.innerText;
 	return {
-		logoSrc: logo?.getAttribute('src') || '',
-		logoAlt: logo?.getAttribute('alt') || '',
-		logoLoaded: Boolean(logo?.complete && logo?.naturalWidth),
+		iconName: logo?.dataset.ggModuleIcon || '',
+		iconRendered: Boolean(logo?.querySelector('svg')),
 		subtitle: subtitle?.textContent.trim() || '',
 		hasLegacyProductName: /ERPNext/.test(visibleText),
 	};
@@ -168,11 +168,13 @@ const brandingIsolation = await evaluate(`(async () => {
 await send("Page.navigate", { url: "http://ggpower.localhost:8002/desk/buying?sidebar=Buying" });
 await waitFor("document.readyState === 'complete'");
 await waitFor("document.querySelector('.sidebar-header .header-subtitle')?.textContent.trim() === 'GGPower ERP'");
-await waitFor("Boolean(document.querySelector('.sidebar-header .gg-sidebar-brand-logo')?.complete && document.querySelector('.sidebar-header .gg-sidebar-brand-logo')?.naturalWidth)");
+await waitFor("document.querySelector('.sidebar-header .header-logo')?.dataset.ggModuleIcon === 'tag'");
+await waitFor("Boolean(document.querySelector('.sidebar-header .header-logo svg'))");
 
 const secondWorkspaceBranding = await evaluate(`(() => ({
 	subtitle: document.querySelector('.sidebar-header .header-subtitle')?.textContent.trim() || '',
-	logoSrc: document.querySelector('.sidebar-header .header-logo img')?.getAttribute('src') || '',
+	iconName: document.querySelector('.sidebar-header .header-logo')?.dataset.ggModuleIcon || '',
+	iconRendered: Boolean(document.querySelector('.sidebar-header .header-logo svg')),
 	hasLegacyProductName: /ERPNext/.test(document.body.innerText),
 }))()`);
 
@@ -187,14 +189,12 @@ console.log(JSON.stringify(secondWorkspaceBranding));
 if (/Georgia|Times New Roman/i.test(result.fontFamily)) throw new Error("Legacy serif font is active");
 if (result.backgroundColor !== "rgb(255, 255, 255)") throw new Error("Desktop background is not white");
 if (result.backgroundImage !== "none") throw new Error("Legacy patterned background is active");
-if (!result.cssV6Loaded || !result.jsV6Loaded) throw new Error("Revisioned Desk assets are missing");
+if (!result.cssV7Loaded || !result.jsV7Loaded) throw new Error("Revisioned Desk assets are missing");
 if (result.customIconCount !== result.moduleCount) throw new Error("Not all module icons were replaced");
 if (result.hasLegacyProductName) throw new Error("Visible ERPNext branding remains on the Desk launcher");
-if (!workspaceBranding.logoSrc.includes('/assets/gg_power/images/gg-power-logo.png')) {
-	throw new Error("Workspace sidebar does not use the GG Power logo");
+if (workspaceBranding.iconName !== "factory" || !workspaceBranding.iconRendered) {
+	throw new Error("Manufacturing sidebar does not use the matching desktop module icon");
 }
-if (workspaceBranding.logoAlt !== "GG Power") throw new Error("Workspace logo alt text is incorrect");
-if (!workspaceBranding.logoLoaded) throw new Error("Workspace logo image did not load");
 if (workspaceBranding.subtitle !== "GGPower ERP") {
 	throw new Error(`Unexpected workspace product name: ${workspaceBranding.subtitle}`);
 }
@@ -219,8 +219,8 @@ if (brandingIsolation.browserBusinessTitle !== "ERPNext Settings") {
 if (secondWorkspaceBranding.subtitle !== "GGPower ERP") {
 	throw new Error("Second workspace product name was not replaced");
 }
-if (!secondWorkspaceBranding.logoSrc.includes('/assets/gg_power/images/gg-power-logo.png')) {
-	throw new Error("Second workspace does not use the GG Power logo");
+if (secondWorkspaceBranding.iconName !== "tag" || !secondWorkspaceBranding.iconRendered) {
+	throw new Error("Buying sidebar does not use the matching desktop module icon");
 }
 if (secondWorkspaceBranding.hasLegacyProductName) {
 	throw new Error("Visible ERPNext branding remains on the second workspace page");

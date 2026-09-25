@@ -18,6 +18,37 @@
 		Subcontracting: "refresh-cw",
 		"ERPNext Settings": "settings",
 	};
+	const MODULE_ALIASES = new Map([
+		["framework", "Framework"],
+		["nen tang", "Framework"],
+		["organization", "Organization"],
+		["company", "Organization"],
+		["to chuc", "Organization"],
+		["accounting", "Accounting"],
+		["ke toan", "Accounting"],
+		["assets", "Assets"],
+		["tai san", "Assets"],
+		["buying", "Buying"],
+		["mua hang", "Buying"],
+		["manufacturing", "Manufacturing"],
+		["san xuat", "Manufacturing"],
+		["projects", "Projects"],
+		["du an", "Projects"],
+		["quality", "Quality"],
+		["chat luong", "Quality"],
+		["selling", "Selling"],
+		["ban hang", "Selling"],
+		["stock", "Stock"],
+		["warehouse", "Stock"],
+		["kho", "Stock"],
+		["subcontracting", "Subcontracting"],
+		["gia cong", "Subcontracting"],
+		["erpnext settings", "ERPNext Settings"],
+		["ggpower erp settings", "ERPNext Settings"],
+		["global-defaults", "ERPNext Settings"],
+		["cai dat erpnext", "ERPNext Settings"],
+		["cai dat ggpower erp", "ERPNext Settings"],
+	]);
 	const BRANDABLE_ATTRIBUTES = ["title", "aria-label", "placeholder"];
 	const EXCLUDED_TEXT_CONTAINERS = "script, style, code, pre, textarea";
 	const BRAND_LABEL_REPLACEMENTS = new Map([
@@ -76,18 +107,46 @@
 		document.querySelectorAll(BRANDING_TEXT_SELECTORS).forEach(replaceBrandingInElement);
 	}
 
+	function normalizeModuleAlias(value) {
+		return String(value || "")
+			.normalize("NFD")
+			.replace(/[\u0300-\u036f]/g, "")
+			.replace(/đ/gi, "d")
+			.trim()
+			.toLowerCase();
+	}
+
+	function resolveSidebarModule(header) {
+		const candidates = [
+			new URLSearchParams(window.location.search).get("sidebar"),
+			...(window.frappe?.get_route?.() || []),
+			...window.location.pathname.split("/").filter(Boolean).reverse(),
+			header.querySelector(".header-title")?.textContent,
+		];
+
+		for (const candidate of candidates) {
+			const moduleId = MODULE_ALIASES.get(normalizeModuleAlias(candidate));
+			if (moduleId) return moduleId;
+		}
+
+		return null;
+	}
+
 	function enhanceSidebarBranding() {
 		document.querySelectorAll(".sidebar-header").forEach((header) => {
 			const logoContainer = header.querySelector(".header-logo");
 			const iconContainer = header.querySelector(".sidebar-item-icon");
-			if (logoContainer && !logoContainer.querySelector(".gg-sidebar-brand-logo")) {
-				const logo = document.createElement("img");
-				logo.className = "gg-sidebar-brand-logo";
-				logo.src = ASSET_LOGO;
-				logo.alt = "GG Power";
-				logoContainer.replaceChildren(logo);
-				logoContainer.classList.add("gg-sidebar-brand-mark");
-				iconContainer?.classList.add("gg-sidebar-brand-icon");
+			const moduleId = resolveSidebarModule(header);
+			const iconName = MODULE_ICONS[moduleId];
+			if (logoContainer && iconName && logoContainer.dataset.ggModuleIcon !== iconName) {
+				logoContainer.innerHTML = frappe.utils.icon(iconName, "md");
+				logoContainer.dataset.ggModuleIcon = iconName;
+				logoContainer.classList.remove("gg-sidebar-brand-mark");
+				logoContainer.classList.add("gg-sidebar-module-mark");
+				logoContainer.setAttribute("aria-hidden", "true");
+				logoContainer.querySelector("svg")?.setAttribute("aria-hidden", "true");
+				iconContainer?.classList.remove("gg-sidebar-brand-icon");
+				iconContainer?.classList.add("gg-sidebar-module-icon");
 				iconContainer?.style.removeProperty("background-color");
 			}
 

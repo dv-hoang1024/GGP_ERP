@@ -248,27 +248,31 @@ html[data-theme="light"] .body-sidebar {
 	background: #f7f9f8;
 }
 
-.sidebar-header .gg-sidebar-brand-icon {
-	background: transparent !important;
+.sidebar-header .gg-sidebar-module-icon {
+	display: inline-flex;
+	width: 42px;
+	height: 42px;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid #dbe9df;
+	border-radius: 12px;
+	background: var(--gg-soft-green) !important;
 }
 
-.sidebar-header .gg-sidebar-brand-mark {
-	position: relative;
-	display: block;
+.sidebar-header .gg-sidebar-module-mark {
+	display: inline-flex;
 	width: 40px;
 	height: 40px;
-	overflow: hidden;
-	border-radius: 8px;
+	align-items: center;
+	justify-content: center;
 }
 
-.sidebar-header .gg-sidebar-brand-logo {
-	position: absolute;
-	top: 0;
-	left: 3px;
-	width: auto !important;
-	max-width: none !important;
-	height: 40px !important;
-	object-fit: initial !important;
+.sidebar-header .gg-sidebar-module-mark svg {
+	width: 26px !important;
+	height: 26px !important;
+	color: var(--gg-green-ink) !important;
+	stroke: currentColor !important;
+	stroke-width: 1.8;
 }
 
 .sidebar-header .header-subtitle {
