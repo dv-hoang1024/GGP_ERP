@@ -247,6 +247,28 @@ body[data-path="login"] .login-content.page-card :focus-visible {
 	outline-offset: 2px;
 }
 
+body[data-path="login"] .page-content-wrapper::after {
+	content: "GG Power ERP\A Hệ thống quản trị doanh nghiệp";
+}
+
+/* The login success screen is rendered into the same body before redirect. */
+body[data-path="login"] > .splash {
+	position: fixed;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	background:
+		radial-gradient(circle at 50% 44%, rgba(17, 156, 74, 0.09), transparent 24%),
+		#f7f4ec;
+}
+
+body[data-path="login"] > .splash img {
+	width: min(240px, 58vw) !important;
+	max-width: 240px !important;
+	height: auto;
+	filter: drop-shadow(0 12px 24px rgba(23, 53, 42, 0.12));
+}
+
 @keyframes gg-login-enter {
 	from {
 		opacity: 0;

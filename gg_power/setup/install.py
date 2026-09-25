@@ -14,6 +14,7 @@ def apply_branding():
 	website_settings = frappe.get_single("Website Settings")
 	website_settings.app_name = BRAND_NAME
 	website_settings.app_logo = BRAND_LOGO
+	website_settings.splash_image = BRAND_LOGO
 	website_settings.save(ignore_permissions=True)
 
 	navbar_settings = frappe.get_single("Navbar Settings")

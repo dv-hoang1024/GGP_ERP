@@ -16,6 +16,10 @@ app_logo_url = "/assets/gg_power/images/gg-power-logo.png"
 web_include_css = ["/assets/gg_power/css/gg_power_login.css"]
 web_include_js = ["/assets/gg_power/js/gg_power_login.js"]
 
+# Desk shell, desktop launcher and bilingual controls.
+app_include_css = ["/assets/gg_power/css/gg_power_desk.css"]
+app_include_js = ["/assets/gg_power/js/gg_power_desk.js"]
+
 # Apps
 # ------------------
 
