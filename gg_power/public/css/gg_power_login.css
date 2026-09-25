@@ -1,0 +1,339 @@
+/* GG Power login identity. All rules are scoped to the Frappe login route. */
+body[data-path="login"] {
+	--gg-green: #119c4a;
+	--gg-green-deep: #087338;
+	--gg-green-soft: #eaf7ef;
+	--gg-orange: #f5821f;
+	--gg-ink: #17352a;
+	--gg-muted: #5c6f66;
+	--gg-border: #d8e7de;
+	--gg-surface: #ffffff;
+	background: #f4faf6;
+	color: var(--gg-ink);
+	font-family: Inter, "Segoe UI", sans-serif;
+}
+
+body[data-path="login"] .page-content-wrapper {
+	position: relative;
+	min-height: 100svh;
+	padding: 0;
+	overflow: hidden;
+	background: #f4faf6;
+}
+
+body[data-path="login"] .page-content-wrapper::before {
+	position: fixed;
+	inset: 0 42% 0 0;
+	z-index: 0;
+	content: "";
+	pointer-events: none;
+	background-image:
+		linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(8, 75, 39, 0.12)),
+		url("/assets/gg_power/images/gg-power-login-background.png");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
+}
+
+body[data-path="login"] .page-content-wrapper::after {
+	position: fixed;
+	left: clamp(32px, 4vw, 72px);
+	bottom: clamp(28px, 5vh, 64px);
+	z-index: 1;
+	max-width: 480px;
+	content: "GG Power ERP\A Hệ thống quản trị doanh nghiệp";
+	white-space: pre-line;
+	color: #17352a;
+	font-size: clamp(15px, 1.25vw, 19px);
+	font-weight: 600;
+	line-height: 1.55;
+	letter-spacing: -0.01em;
+	pointer-events: none;
+}
+
+body[data-path="login"] main.container {
+	position: relative;
+	z-index: 2;
+	width: 100%;
+	max-width: none;
+	min-height: 100svh;
+	margin: 0;
+	padding: 0;
+}
+
+body[data-path="login"] .page_content,
+body[data-path="login"] .page_content > div {
+	min-height: 100svh;
+}
+
+body[data-path="login"] .page_content > div {
+	display: flex;
+	width: 42%;
+	min-width: 480px;
+	box-sizing: border-box;
+	margin-left: auto;
+	align-items: center;
+	justify-content: center;
+	padding: clamp(32px, 5vw, 72px);
+	background:
+		radial-gradient(circle at 100% 0%, rgba(245, 130, 31, 0.08), transparent 34%),
+		linear-gradient(180deg, #fbfdfb 0%, #f2f8f4 100%);
+}
+
+body[data-path="login"] .page_content section {
+	width: 100%;
+	min-width: 0;
+	max-width: 420px;
+}
+
+body[data-path="login"] .login-content.page-card {
+	width: 100%;
+	max-width: none;
+	min-height: 0;
+	box-sizing: border-box;
+	margin: 0;
+	padding: clamp(28px, 3vw, 40px);
+	gap: 24px;
+	border: 1px solid rgba(17, 156, 74, 0.15);
+	border-radius: 24px;
+	background: rgba(255, 255, 255, 0.96);
+	box-shadow: 0 24px 64px rgba(22, 67, 45, 0.12), 0 4px 16px rgba(22, 67, 45, 0.06);
+	animation: gg-login-enter 280ms ease-out both;
+}
+
+body[data-path="login"] .page-card-head {
+	align-items: flex-start;
+	gap: 22px;
+}
+
+body[data-path="login"] .page-card-head .app-logo {
+	width: min(100%, 210px);
+	height: auto;
+	max-height: 88px;
+	object-fit: contain;
+	object-position: left center;
+}
+
+body[data-path="login"] .page-card-head-text {
+	align-items: flex-start;
+	text-align: left;
+}
+
+body[data-path="login"] .page-card-head h4 {
+	margin: 0;
+	color: var(--gg-ink);
+	font-size: 24px;
+	font-weight: 700;
+	line-height: 1.25;
+	letter-spacing: -0.025em;
+}
+
+body[data-path="login"] .page-card-subtitle,
+body[data-path="login"] .sign-up-message {
+	color: var(--gg-muted);
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+body[data-path="login"] .login-content.page-card form {
+	gap: 20px;
+}
+
+body[data-path="login"] .login-content.page-card .page-card-body {
+	gap: 18px;
+}
+
+body[data-path="login"] .login-content.page-card .form-group {
+	gap: 8px;
+}
+
+body[data-path="login"] .login-content.page-card .form-label {
+	color: #344f43;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+body[data-path="login"] .login-content.page-card input[type="text"],
+body[data-path="login"] .login-content.page-card input[type="email"],
+body[data-path="login"] .login-content.page-card input[type="password"] {
+	height: 48px;
+	padding: 12px 42px;
+	border: 1px solid var(--gg-border);
+	border-radius: 12px;
+	background: #fbfdfc;
+	color: var(--gg-ink);
+	font-size: 15px;
+	transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+body[data-path="login"] .login-content.page-card input:hover {
+	border-color: #a8cdb8;
+	background: #ffffff;
+}
+
+body[data-path="login"] .login-content.page-card input:focus {
+	border-color: var(--gg-green-deep);
+	background: #ffffff;
+	box-shadow: 0 0 0 3px rgba(17, 156, 74, 0.15);
+	outline: none;
+}
+
+body[data-path="login"] .login-content.page-card .field-icon,
+body[data-path="login"] .login-content.page-card .toggle-password {
+	top: 16px;
+	color: #6d8177;
+}
+
+body[data-path="login"] .login-content.page-card .forgot-password-message {
+	margin-top: 2px;
+	text-align: right;
+}
+
+body[data-path="login"] .login-content.page-card a {
+	color: var(--gg-green-deep);
+	font-weight: 600;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 3px;
+}
+
+body[data-path="login"] .login-content.page-card a:hover {
+	color: #065d2e;
+	text-decoration: underline;
+}
+
+body[data-path="login"] .login-content.page-card .page-card-actions {
+	gap: 14px;
+}
+
+body[data-path="login"] .login-content.page-card .btn-login,
+body[data-path="login"] .login-content.page-card .btn-signup {
+	min-height: 48px;
+	border: 1px solid var(--gg-green-deep);
+	border-radius: 12px;
+	background: var(--gg-green-deep);
+	color: #ffffff;
+	font-size: 15px;
+	font-weight: 700;
+	box-shadow: 0 8px 18px rgba(8, 115, 56, 0.18);
+	transition: transform 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+}
+
+body[data-path="login"] .login-content.page-card .btn-login:hover,
+body[data-path="login"] .login-content.page-card .btn-login:focus-visible,
+body[data-path="login"] .login-content.page-card .btn-signup:hover,
+body[data-path="login"] .login-content.page-card .btn-signup:focus-visible {
+	border-color: #065d2e;
+	background: #065d2e;
+	color: #ffffff;
+	box-shadow: 0 10px 22px rgba(8, 115, 56, 0.24), 0 0 0 3px rgba(17, 156, 74, 0.18);
+	transform: translateY(-1px);
+}
+
+body[data-path="login"] .login-content.page-card .btn-login:active,
+body[data-path="login"] .login-content.page-card .btn-signup:active {
+	transform: translateY(0);
+}
+
+body[data-path="login"] .login-content.page-card .btn-login-option {
+	min-height: 44px;
+	border: 1px solid var(--gg-border);
+	border-radius: 12px;
+	background: var(--gg-green-soft);
+	color: var(--gg-ink);
+}
+
+body[data-path="login"] .login-content.page-card :focus-visible {
+	outline: 3px solid rgba(8, 115, 56, 0.3);
+	outline-offset: 2px;
+}
+
+@keyframes gg-login-enter {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@media (max-width: 1100px) {
+	body[data-path="login"] .page-content-wrapper::before {
+		right: 48%;
+	}
+
+	body[data-path="login"] .page-content-wrapper::after {
+		max-width: 360px;
+	}
+
+	body[data-path="login"] .page_content > div {
+		width: 48%;
+		min-width: 460px;
+		padding: 36px;
+	}
+}
+
+@media (max-width: 880px) {
+	body[data-path="login"] .page-content-wrapper::before,
+	body[data-path="login"] .page-content-wrapper::after {
+		display: none;
+	}
+
+	body[data-path="login"] .page_content > div {
+		width: 100%;
+		min-width: 0;
+		max-width: 100vw;
+		padding: 32px 20px;
+		background:
+			radial-gradient(circle at 15% 8%, rgba(245, 130, 31, 0.12), transparent 24%),
+			radial-gradient(circle at 90% 90%, rgba(17, 156, 74, 0.12), transparent 28%),
+			#f4faf6;
+	}
+
+	body[data-path="login"] .login-content.page-card {
+		width: 100%;
+		max-width: 440px;
+		margin: 0 auto;
+	}
+}
+
+@media (max-width: 480px) {
+	body[data-path="login"] .page_content > div {
+		width: 100vw;
+		max-width: 100vw;
+		padding: 0;
+		background: #ffffff;
+	}
+
+	body[data-path="login"] .page_content section {
+		width: 100vw;
+		max-width: none;
+	}
+
+	body[data-path="login"] .login-content.page-card {
+		width: 100vw;
+		max-width: 100vw;
+		min-height: 100svh;
+		justify-content: center;
+		padding: 40px 24px;
+		border: 0;
+		border-radius: 0;
+		box-shadow: none;
+	}
+
+	body[data-path="login"] .page-card-head .app-logo {
+		width: min(100%, 180px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body[data-path="login"] *,
+	body[data-path="login"] *::before,
+	body[data-path="login"] *::after {
+		scroll-behavior: auto !important;
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}

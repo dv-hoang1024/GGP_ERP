@@ -5,6 +5,17 @@ app_description = "GG Power ERP"
 app_email = "hoangdv@ggp.vn"
 app_license = "mit"
 
+# GG Power brand assets
+# ---------------------
+
+# Used by Frappe as a fallback when no site-level logo has been configured.
+app_logo_url = "/assets/gg_power/images/gg-power-logo.png"
+
+# The stylesheet is scoped to body[data-path="login"], so other website pages
+# retain their native Frappe/ERPNext appearance.
+web_include_css = ["/assets/gg_power/css/gg_power_login.css"]
+web_include_js = ["/assets/gg_power/js/gg_power_login.js"]
+
 # Apps
 # ------------------
 
@@ -86,7 +97,7 @@ app_license = "mit"
 # ------------
 
 # before_install = "gg_power.install.before_install"
-# after_install = "gg_power.install.after_install"
+after_install = "gg_power.setup.install.after_install"
 
 # Uninstallation
 # ------------
@@ -261,4 +272,3 @@ app_license = "mit"
 # ------------
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
-
