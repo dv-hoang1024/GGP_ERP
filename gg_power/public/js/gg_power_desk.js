@@ -3,6 +3,20 @@
 
 	const ASSET_LOGO = "/assets/gg_power/images/gg-power-logo.png";
 	const LANGUAGE_API = "gg_power.api.set_language";
+	const MODULE_ICONS = {
+		Framework: "box",
+		Organization: "network",
+		Accounting: "calculator",
+		Assets: "boxes",
+		Buying: "tag",
+		Manufacturing: "factory",
+		Projects: "presentation",
+		Quality: "shield-check",
+		Selling: "receipt-text",
+		Stock: "warehouse",
+		Subcontracting: "refresh-cw",
+		"ERPNext Settings": "settings",
+	};
 
 	function currentLanguage() {
 		const language = window.frappe?.boot?.lang || document.documentElement.lang || "en";
@@ -80,16 +94,20 @@
 			intro.className = "gg-desk-intro";
 			intro.setAttribute("aria-labelledby", "gg-desk-title");
 			intro.innerHTML = `
-				<div>
-					<p class="gg-desk-kicker">GG POWER ERP</p>
-					<h1 id="gg-desk-title">${labels.title}</h1>
-					<p class="gg-desk-subtitle">${labels.subtitle}</p>
-				</div>
-				<div class="gg-desk-rule" aria-hidden="true"></div>`;
+				<h1 id="gg-desk-title">${labels.title}</h1>
+				<p class="gg-desk-subtitle">${labels.subtitle}</p>`;
 			container.before(intro);
 		}
 
 		wrapper.querySelectorAll(".desktop-icon").forEach((icon) => {
+			const iconName = MODULE_ICONS[icon.dataset.id];
+			const iconContainer = icon.querySelector(".icon-container");
+			if (iconName && iconContainer && !iconContainer.classList.contains("gg-module-icon")) {
+				iconContainer.classList.add("gg-module-icon");
+				iconContainer.innerHTML = frappe.utils.icon(iconName, "md");
+				iconContainer.querySelector("svg")?.setAttribute("aria-hidden", "true");
+			}
+
 			if (icon.dataset.ggKeyboardReady) return;
 			icon.dataset.ggKeyboardReady = "true";
 			icon.tabIndex = 0;

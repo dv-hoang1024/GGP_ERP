@@ -257,9 +257,7 @@ body[data-path="login"] > .splash {
 	inset: 0;
 	display: grid;
 	place-items: center;
-	background:
-		radial-gradient(circle at 50% 44%, rgba(17, 156, 74, 0.09), transparent 24%),
-		#f7f4ec;
+	background: #ffffff;
 }
 
 body[data-path="login"] > .splash img {
