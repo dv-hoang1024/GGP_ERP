@@ -17,8 +17,8 @@ web_include_css = ["/assets/gg_power/css/gg_power_login.css"]
 web_include_js = ["/assets/gg_power/js/gg_power_login.js"]
 
 # Desk shell, desktop launcher and bilingual controls.
-app_include_css = ["/assets/gg_power/css/gg_power_desk.css"]
-app_include_js = ["/assets/gg_power/js/gg_power_desk.js"]
+app_include_css = ["/assets/gg_power/css/gg_power_desk_v2.css"]
+app_include_js = ["/assets/gg_power/js/gg_power_desk_v2.js"]
 
 # Apps
 # ------------------
