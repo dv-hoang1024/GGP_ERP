@@ -2,6 +2,7 @@
 	"use strict";
 
 	const ASSET_LOGO = "/assets/gg_power/images/gg-power-logo.png";
+	const BRAND_NAME = "GGPower ERP";
 	const LANGUAGE_API = "gg_power.api.set_language";
 	const MODULE_ICONS = {
 		Framework: "box",
@@ -17,6 +18,113 @@
 		Subcontracting: "refresh-cw",
 		"ERPNext Settings": "settings",
 	};
+	const BRANDABLE_ATTRIBUTES = ["title", "aria-label", "placeholder"];
+	const EXCLUDED_TEXT_CONTAINERS = "script, style, code, pre, textarea";
+	const BRAND_LABEL_REPLACEMENTS = new Map([
+		["ERPNext", BRAND_NAME],
+		["ERPNext Settings", `${BRAND_NAME} Settings`],
+		["Cài đặt ERPNext", `Cài đặt ${BRAND_NAME}`],
+	]);
+	const BRANDING_TEXT_SELECTORS = [
+		".sidebar-header .header-title",
+		".sidebar-header .header-subtitle",
+		".sidebar-header-menu .menu-item-title",
+		".desktop-wrapper .icon-title",
+		".navbar .menu-item-title",
+		".app-switcher .app-title",
+	].join(",");
+
+	function replaceBrandLabel(value) {
+		if (typeof value !== "string") return value;
+		const label = value.trim();
+		const replacement = BRAND_LABEL_REPLACEMENTS.get(label);
+		return replacement ? value.replace(label, replacement) : value;
+	}
+
+	function enhanceBrandMetadata() {
+		for (const app of window.frappe?.boot?.app_data || []) {
+			if (app.app_name === "erpnext" || app.app_title?.includes("ERPNext")) {
+				app.app_title = BRAND_NAME;
+				app.app_logo_url = ASSET_LOGO;
+			}
+		}
+	}
+
+	function replaceBrandingInElement(element) {
+		const replaceTextNode = (node) => {
+			if (!node.nodeValue) return;
+			if (node.parentElement?.closest(EXCLUDED_TEXT_CONTAINERS)) return;
+			const brandedValue = replaceBrandLabel(node.nodeValue);
+			if (node.nodeValue !== brandedValue) node.nodeValue = brandedValue;
+		};
+
+		const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+		let node;
+		while ((node = walker.nextNode())) replaceTextNode(node);
+
+		for (const attribute of BRANDABLE_ATTRIBUTES) {
+			if (!element.hasAttribute(attribute)) continue;
+			const value = element.getAttribute(attribute);
+			const brandedValue = replaceBrandLabel(value);
+			if (value !== brandedValue) {
+				element.setAttribute(attribute, brandedValue);
+			}
+		}
+	}
+
+	function replaceVisibleBranding() {
+		document.querySelectorAll(BRANDING_TEXT_SELECTORS).forEach(replaceBrandingInElement);
+	}
+
+	function enhanceSidebarBranding() {
+		document.querySelectorAll(".sidebar-header").forEach((header) => {
+			const logoContainer = header.querySelector(".header-logo");
+			const iconContainer = header.querySelector(".sidebar-item-icon");
+			if (logoContainer && !logoContainer.querySelector(".gg-sidebar-brand-logo")) {
+				const logo = document.createElement("img");
+				logo.className = "gg-sidebar-brand-logo";
+				logo.src = ASSET_LOGO;
+				logo.alt = "GG Power";
+				logoContainer.replaceChildren(logo);
+				logoContainer.classList.add("gg-sidebar-brand-mark");
+				iconContainer?.classList.add("gg-sidebar-brand-icon");
+				iconContainer?.style.removeProperty("background-color");
+			}
+
+			const subtitle = header.querySelector(".header-subtitle");
+			if (subtitle && subtitle.textContent.trim() !== BRAND_NAME) {
+				subtitle.textContent = BRAND_NAME;
+			}
+		});
+	}
+
+	function enhanceProductBranding() {
+		enhanceBrandMetadata();
+		enhanceSidebarBranding();
+		replaceVisibleBranding();
+	}
+
+	function observeProductBranding() {
+		if (!document.body || document.body.dataset.ggBrandObserverReady) return;
+		document.body.dataset.ggBrandObserverReady = "true";
+		let pendingFrame = null;
+
+		const observer = new MutationObserver(() => {
+			if (pendingFrame !== null) return;
+			pendingFrame = window.requestAnimationFrame(() => {
+				pendingFrame = null;
+				enhanceProductBranding();
+			});
+		});
+
+		observer.observe(document.body, {
+			attributes: true,
+			attributeFilter: BRANDABLE_ATTRIBUTES,
+			childList: true,
+			characterData: true,
+			subtree: true,
+		});
+	}
 
 	function currentLanguage() {
 		const language = window.frappe?.boot?.lang || document.documentElement.lang || "en";
@@ -140,15 +248,22 @@
 			return;
 		}
 
+		enhanceBrandMetadata();
+
 		window.jQuery(document)
 			.off("desktop_screen.gg_power page-change.gg_power toolbar_setup.gg_power")
 			.on("desktop_screen.gg_power", enhanceDesktop)
 			.on("page-change.gg_power toolbar_setup.gg_power", () => {
-				window.setTimeout(enhancePageHeader, 0);
+				window.setTimeout(() => {
+					enhancePageHeader();
+					enhanceProductBranding();
+				}, 0);
 			});
 
 		enhanceDesktop();
 		enhancePageHeader();
+		enhanceProductBranding();
+		observeProductBranding();
 	}
 
 	init();

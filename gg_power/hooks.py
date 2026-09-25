@@ -1,7 +1,7 @@
 app_name = "gg_power"
-app_title = "GG Power"
+app_title = "GGPower ERP"
 app_publisher = "hoangdv"
-app_description = "GG Power ERP"
+app_description = "GGPower ERP"
 app_email = "hoangdv@ggp.vn"
 app_license = "mit"
 
@@ -17,8 +17,8 @@ web_include_css = ["/assets/gg_power/css/gg_power_login.css"]
 web_include_js = ["/assets/gg_power/js/gg_power_login.js"]
 
 # Desk shell, desktop launcher and bilingual controls.
-app_include_css = ["/assets/gg_power/css/gg_power_desk_v2.css"]
-app_include_js = ["/assets/gg_power/js/gg_power_desk_v2.js"]
+app_include_css = ["/assets/gg_power/css/gg_power_desk_v6.css"]
+app_include_js = ["/assets/gg_power/js/gg_power_desk_v6.js"]
 
 # Apps
 # ------------------

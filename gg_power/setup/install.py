@@ -1,7 +1,7 @@
 import frappe
 
 
-BRAND_NAME = "GG Power ERP"
+BRAND_NAME = "GGPower ERP"
 BRAND_LOGO = "/assets/gg_power/images/gg-power-logo.png"
 
 

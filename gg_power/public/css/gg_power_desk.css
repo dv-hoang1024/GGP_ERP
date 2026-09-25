@@ -248,6 +248,33 @@ html[data-theme="light"] .body-sidebar {
 	background: #f7f9f8;
 }
 
+.sidebar-header .gg-sidebar-brand-icon {
+	background: transparent !important;
+}
+
+.sidebar-header .gg-sidebar-brand-mark {
+	position: relative;
+	display: block;
+	width: 40px;
+	height: 40px;
+	overflow: hidden;
+	border-radius: 8px;
+}
+
+.sidebar-header .gg-sidebar-brand-logo {
+	position: absolute;
+	top: 0;
+	left: 3px;
+	width: auto !important;
+	max-width: none !important;
+	height: 40px !important;
+	object-fit: initial !important;
+}
+
+.sidebar-header .header-subtitle {
+	color: var(--gg-muted);
+}
+
 html[data-theme="light"] .frappe-card,
 html[data-theme="light"] .form-page,
 html[data-theme="light"] .layout-main-section.frappe-card {
