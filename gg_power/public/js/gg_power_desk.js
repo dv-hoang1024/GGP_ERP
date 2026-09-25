@@ -2,6 +2,7 @@
 	"use strict";
 
 	const ASSET_LOGO = "/assets/gg_power/images/gg-power-logo.png";
+	const DESK_HERO = "/assets/gg_power/images/gg-power-campus-watercolor.png";
 	const BRAND_NAME = "GGPower ERP";
 	const LANGUAGE_API = "gg_power.api.set_language";
 	const MODULE_ICONS = {
@@ -17,6 +18,50 @@
 		Stock: "warehouse",
 		Subcontracting: "refresh-cw",
 		"ERPNext Settings": "settings",
+	};
+	const MODULE_TONES = {
+		Framework: "neutral",
+		Organization: "green",
+		Accounting: "blue",
+		Assets: "purple",
+		Buying: "purple",
+		Manufacturing: "green",
+		Projects: "orange",
+		Quality: "blue",
+		Selling: "green",
+		Stock: "orange",
+		Subcontracting: "purple",
+		"ERPNext Settings": "neutral",
+	};
+	const MODULE_DESCRIPTIONS = {
+		vi: {
+			Framework: "Nền tảng và công cụ hệ thống",
+			Organization: "Công ty, phòng ban và nhân sự",
+			Accounting: "Tài chính, công nợ và hạch toán",
+			Assets: "Tài sản, bảo trì và khấu hao",
+			Buying: "Yêu cầu, báo giá và đơn mua hàng",
+			Manufacturing: "Kế hoạch, lệnh sản xuất và năng lực",
+			Projects: "Kế hoạch, tiến độ và nguồn lực",
+			Quality: "Kiểm tra và kiểm soát chất lượng",
+			Selling: "Báo giá, đơn hàng và giao hàng",
+			Stock: "Tồn kho, nhập xuất và điều chuyển",
+			Subcontracting: "Theo dõi nghiệp vụ gia công",
+			"ERPNext Settings": "Cấu hình, danh mục và tham số",
+		},
+		en: {
+			Framework: "Platform and system tools",
+			Organization: "Companies, teams and people",
+			Accounting: "Finance, receivables and ledgers",
+			Assets: "Assets, maintenance and depreciation",
+			Buying: "Requests, quotations and purchase orders",
+			Manufacturing: "Plans, work orders and capacity",
+			Projects: "Plans, progress and resources",
+			Quality: "Inspection and quality control",
+			Selling: "Quotations, orders and deliveries",
+			Stock: "Inventory, receipts and transfers",
+			Subcontracting: "Subcontracting operations",
+			"ERPNext Settings": "Configuration and system defaults",
+		},
 	};
 	const MODULE_ALIASES = new Map([
 		["framework", "Framework"],
@@ -193,16 +238,24 @@
 	function copy() {
 		return currentLanguage() === "vi"
 			? {
-				title: "Trung tâm điều hành",
-				subtitle: "Chọn phân hệ để bắt đầu công việc.",
+				eyebrow: "Xin chào trở lại,",
+				title: "Chọn ứng dụng để bắt đầu làm việc",
+				subtitle: "Truy cập nhanh các phân hệ nghiệp vụ của GG Power ERP, được thiết kế tối ưu cho doanh nghiệp sản xuất.",
+				appsTitle: "Các ứng dụng nghiệp vụ",
+				appsSubtitle: "Chọn phân hệ để truy cập và bắt đầu công việc của bạn.",
+				sustainability: "Năng lượng xanh vì một tương lai bền vững",
 				switchLabel: "EN",
 				switchTitle: "Switch to English",
 				loading: "Đang chuyển sang tiếng Anh...",
 				nextLanguage: "en",
 			  }
 			: {
-				title: "Operations desk",
-				subtitle: "Choose a workspace to begin.",
+				eyebrow: "Welcome back,",
+				title: "Choose an application to get started",
+				subtitle: "Quick access to GG Power ERP business workspaces, optimized for manufacturing operations.",
+				appsTitle: "Business applications",
+				appsSubtitle: "Choose a workspace to access your work.",
+				sustainability: "Green energy for a sustainable future",
 				switchLabel: "VI",
 				switchTitle: "Chuyển sang tiếng Việt",
 				loading: "Đang chuyển sang tiếng Việt...",
@@ -255,24 +308,65 @@
 			logo.alt = "GG Power";
 		}
 
-		if (!wrapper.querySelector(".gg-desk-intro")) {
-			const labels = copy();
-			const intro = document.createElement("section");
-			intro.className = "gg-desk-intro";
-			intro.setAttribute("aria-labelledby", "gg-desk-title");
-			intro.innerHTML = `
-				<h1 id="gg-desk-title">${labels.title}</h1>
-				<p class="gg-desk-subtitle">${labels.subtitle}</p>`;
-			container.before(intro);
+		wrapper.querySelector(".gg-desk-intro")?.remove();
+		const labels = copy();
+		if (!wrapper.querySelector(".gg-desk-hero")) {
+			const hero = document.createElement("section");
+			hero.className = "gg-desk-hero";
+			hero.setAttribute("aria-labelledby", "gg-desk-title");
+			hero.innerHTML = `
+				<div class="gg-desk-hero__copy">
+					<p class="gg-desk-eyebrow">${labels.eyebrow}</p>
+					<h1 id="gg-desk-title">${labels.title}</h1>
+					<p class="gg-desk-subtitle">${labels.subtitle}</p>
+				</div>
+				<div class="gg-desk-hero__visual" aria-hidden="true">
+					<img src="${DESK_HERO}" alt="" loading="eager">
+					<div class="gg-desk-sustainability">
+						${frappe.utils.icon("leaf", "md")}
+						<span>${labels.sustainability}</span>
+					</div>
+				</div>`;
+			container.before(hero);
+		}
+
+		const iconsContainer = container.querySelector(".icons-container");
+		const icons = iconsContainer?.querySelector(".icons");
+		if (iconsContainer && icons && !iconsContainer.querySelector(".gg-apps-heading")) {
+			const heading = document.createElement("header");
+			heading.className = "gg-apps-heading";
+			heading.innerHTML = `
+				<div>
+					<h2>${labels.appsTitle}</h2>
+					<p>${labels.appsSubtitle}</p>
+				</div>`;
+			icons.before(heading);
 		}
 
 		wrapper.querySelectorAll(".desktop-icon").forEach((icon) => {
-			const iconName = MODULE_ICONS[icon.dataset.id];
+			const moduleId = icon.dataset.id;
+			const iconName = MODULE_ICONS[moduleId];
 			const iconContainer = icon.querySelector(".icon-container");
 			if (iconName && iconContainer && !iconContainer.classList.contains("gg-module-icon")) {
 				iconContainer.classList.add("gg-module-icon");
 				iconContainer.innerHTML = frappe.utils.icon(iconName, "md");
 				iconContainer.querySelector("svg")?.setAttribute("aria-hidden", "true");
+			}
+
+			if (!icon.classList.contains("gg-app-card")) {
+				const title = icon.querySelector(".icon-title");
+				const copyContainer = document.createElement("span");
+				const description = document.createElement("span");
+				const arrow = document.createElement("span");
+				copyContainer.className = "gg-app-card__copy";
+				description.className = "gg-app-card__description";
+				description.textContent = MODULE_DESCRIPTIONS[currentLanguage()]?.[moduleId] || "";
+				arrow.className = "gg-app-card__arrow";
+				arrow.setAttribute("aria-hidden", "true");
+				arrow.innerHTML = frappe.utils.icon("chevron-right", "sm");
+				if (title) copyContainer.append(title, description);
+				icon.append(copyContainer, arrow);
+				icon.classList.add("gg-app-card", `gg-app-card--${MODULE_TONES[moduleId] || "green"}`);
 			}
 
 			if (icon.dataset.ggKeyboardReady) return;

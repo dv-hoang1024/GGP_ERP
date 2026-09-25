@@ -4,6 +4,7 @@ const port = process.env.GGP_CDP_PORT || "9229";
 const user = process.env.GGP_TEST_USER || "Administrator";
 const password = process.env.GGP_TEST_PASSWORD;
 const screenshotPath = process.env.GGP_SCREENSHOT_PATH;
+const screenshotStem = screenshotPath?.replace(/\.png$/i, "") || "";
 
 if (!password || !screenshotPath) {
 	throw new Error("GGP_TEST_PASSWORD and GGP_SCREENSHOT_PATH are required");
@@ -81,11 +82,12 @@ if (loginResult !== 200) throw new Error(`Login failed with HTTP ${loginResult}`
 
 await send("Page.navigate", { url: "http://ggpower.localhost:8002/desk" });
 await waitFor("document.readyState === 'complete'");
-await waitFor("Boolean(document.querySelector('.gg-desk-intro') && document.querySelectorAll('.desktop-icon').length)");
+await waitFor("Boolean(document.querySelector('.gg-desk-hero') && document.querySelectorAll('.desktop-icon').length)");
 
 const result = await evaluate(`(() => {
-	const heading = document.querySelector('.gg-desk-intro h1');
+	const heading = document.querySelector('.gg-desk-hero h1');
 	const wrapper = document.querySelector('.desktop-wrapper');
+	const heroImage = document.querySelector('.gg-desk-hero__visual img');
 	const headingStyle = getComputedStyle(heading);
 	const wrapperStyle = getComputedStyle(wrapper);
 	return {
@@ -95,16 +97,22 @@ const result = await evaluate(`(() => {
 		backgroundImage: wrapperStyle.backgroundImage,
 		moduleCount: document.querySelectorAll('.desktop-icon').length,
 		customIconCount: document.querySelectorAll('.gg-module-icon').length,
+		appCardCount: document.querySelectorAll('.gg-app-card').length,
+		heroImageSrc: heroImage?.getAttribute('src') || '',
+		heroImageLoaded: Boolean(heroImage?.complete && heroImage?.naturalWidth),
 		moduleRoutes: Array.from(document.querySelectorAll('.desktop-icon')).map((icon) => ({
 			id: icon.dataset.id,
 			href: icon.getAttribute('href'),
 		})),
 		hasLegacyProductName: /ERPNext/.test(document.body.innerText),
-		cssV7Loaded: Array.from(document.styleSheets).some((sheet) => sheet.href?.includes('gg_power_desk_v7.css')),
-		jsV7Loaded: Array.from(document.scripts).some((script) => script.src.includes('gg_power_desk_v7.js')),
+		cssV9Loaded: Array.from(document.styleSheets).some((sheet) => sheet.href?.includes('gg_power_desk_v9.css')),
+		jsV9Loaded: Array.from(document.scripts).some((script) => script.src.includes('gg_power_desk_v9.js')),
 	};
 })()`);
 console.log(JSON.stringify(result));
+
+const deskScreenshot = await send("Page.captureScreenshot", { format: "png", captureBeyondViewport: false });
+await writeFile(`${screenshotStem}-desk.png`, Buffer.from(deskScreenshot.data, "base64"));
 
 await send("Page.navigate", { url: "http://ggpower.localhost:8002/app/manufacturing" });
 await waitFor("document.readyState === 'complete'");
@@ -112,6 +120,7 @@ await waitFor("Boolean(document.querySelector('.sidebar-header .header-logo'))")
 await waitFor("document.querySelector('.sidebar-header .header-subtitle')?.textContent.trim() === 'GGPower ERP'");
 await waitFor("document.querySelector('.sidebar-header .header-logo')?.dataset.ggModuleIcon === 'factory'");
 await waitFor("Boolean(document.querySelector('.sidebar-header .header-logo svg'))");
+await waitFor("Boolean(document.querySelector('.gg-manufacturing-dashboard:not([aria-busy])'))", 30000);
 
 const workspaceBranding = await evaluate(`(() => {
 	const logo = document.querySelector('.sidebar-header .header-logo');
@@ -122,8 +131,17 @@ const workspaceBranding = await evaluate(`(() => {
 		iconRendered: Boolean(logo?.querySelector('svg')),
 		subtitle: subtitle?.textContent.trim() || '',
 		hasLegacyProductName: /ERPNext/.test(visibleText),
+		dashboardRendered: Boolean(document.querySelector('.gg-manufacturing-dashboard')),
+		kpiCount: document.querySelectorAll('.gg-mfg-kpi').length,
+		chartMonthCount: document.querySelectorAll('.gg-mfg-chart__month').length,
+		shortcutCount: document.querySelectorAll('.gg-mfg-shortcut').length,
+		dashboardWidth: Math.round(document.querySelector('.gg-manufacturing-dashboard')?.getBoundingClientRect().width || 0),
+		pageContentWidth: Math.round(document.querySelector('.page-content')?.getBoundingClientRect().width || 0),
 	};
 })()`);
+
+const manufacturingScreenshot = await send("Page.captureScreenshot", { format: "png", captureBeyondViewport: false });
+await writeFile(`${screenshotStem}-manufacturing.png`, Buffer.from(manufacturingScreenshot.data, "base64"));
 
 const brandingIsolation = await evaluate(`(async () => {
 	const businessContent = document.createElement('div');
@@ -187,10 +205,13 @@ console.log(JSON.stringify(brandingIsolation));
 console.log(JSON.stringify(secondWorkspaceBranding));
 
 if (/Georgia|Times New Roman/i.test(result.fontFamily)) throw new Error("Legacy serif font is active");
-if (result.backgroundColor !== "rgb(255, 255, 255)") throw new Error("Desktop background is not white");
-if (result.backgroundImage !== "none") throw new Error("Legacy patterned background is active");
-if (!result.cssV7Loaded || !result.jsV7Loaded) throw new Error("Revisioned Desk assets are missing");
+if (!result.backgroundImage.includes("linear-gradient")) throw new Error("New Desk background is missing");
+if (!result.cssV9Loaded || !result.jsV9Loaded) throw new Error("Revisioned Desk assets are missing");
 if (result.customIconCount !== result.moduleCount) throw new Error("Not all module icons were replaced");
+if (result.appCardCount !== result.moduleCount) throw new Error("Not all modules use the new app card design");
+if (!result.heroImageSrc.includes("gg-power-campus-watercolor.png") || !result.heroImageLoaded) {
+	throw new Error("Desk hero does not use the supplied GG Power artwork");
+}
 if (result.hasLegacyProductName) throw new Error("Visible ERPNext branding remains on the Desk launcher");
 if (workspaceBranding.iconName !== "factory" || !workspaceBranding.iconRendered) {
 	throw new Error("Manufacturing sidebar does not use the matching desktop module icon");
@@ -200,6 +221,15 @@ if (workspaceBranding.subtitle !== "GGPower ERP") {
 }
 if (workspaceBranding.hasLegacyProductName) {
 	throw new Error("Visible ERPNext branding remains on the workspace page");
+}
+if (!workspaceBranding.dashboardRendered || workspaceBranding.kpiCount !== 5) {
+	throw new Error("Manufacturing dashboard KPI section was not rendered");
+}
+if (workspaceBranding.chartMonthCount !== 6 || workspaceBranding.shortcutCount < 7) {
+	throw new Error("Manufacturing dashboard content is incomplete");
+}
+if (workspaceBranding.dashboardWidth < workspaceBranding.pageContentWidth - 2) {
+	throw new Error("Manufacturing dashboard does not use the available content width");
 }
 if (brandingIsolation.businessText !== "Customer note about ERPNext integration") {
 	throw new Error("Business content was changed by the branding layer");

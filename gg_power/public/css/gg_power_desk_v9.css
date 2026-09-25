@@ -1,0 +1,3 @@
+/* Cache-busting entry point for the GG Power Desk and manufacturing dashboard. */
+@import url("/assets/gg_power/css/gg_power_desk.css?revision=20260925-9");
+@import url("/assets/gg_power/css/gg_power_manufacturing_dashboard.css?revision=20260925-9");
